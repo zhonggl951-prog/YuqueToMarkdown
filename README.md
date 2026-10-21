@@ -1,83 +1,49 @@
-# 🌿 YuqueToMarkdown Pro (语雀知识库树形高保真转换器)
+# YuqueToMarkdown
 
-<p align="center">
-  <img src="https://img.shields.io/badge/version-v8.0--Pro-blue.svg?style=flat-square" alt="Version">
-  <img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat-square" alt="License">
-  <img src="https://img.shields.io/badge/pure-client--side-orange.svg?style=flat-square" alt="Client-Side">
-  <img src="https://img.shields.io/badge/Obsidian-compatible-purple.svg?style=flat-square" alt="Obsidian Compatible">
-</p>
+将语雀导出的知识库（`.lakebook`）转换为保留目录层级与本地图片的 Markdown 压缩包。
 
-> **一键将语雀导出归档包（`.lakebook` / `.tar`）高保真转换为保留完整多层级文件夹结构的 Markdown 知识库。**
-> 100% 运行于浏览器前端，绝不上传任何个人数据，保护隐私安全。完美无缝对接 Obsidian、Logseq、Notion 与 VS Code。
+## 解决的问题
 
----
+语雀导出的 `.lakebook` 文件本质是一个 TAR 归档包，内部的 JSON 文档默认全量平铺，知识库的目录层级记录在 `$meta.json`（`book.tocYml`）中。
 
-## ✨ 核心亮点与痛点解决
+常规脚本如果只按标题简单重命名导出，容易产生以下问题：
+- 目录层级丢失，所有文档被拍平在单个目录下；
+- 目录容器节点（没有正文只有子页面的目录）被直接丢弃；
+- 同名文档（如多次出现的“无标题文档”、“总结”）相互覆盖；
+- 正文图片仍指向语雀在线 CDN，离线或图床失效后无法显示。
 
-很多开源语雀转换脚本（包括旧版提取器）会将所有文档暴力平铺导出到单一根目录下，丢失了语雀中精心构建的目录大纲，且会导致重名文档相互覆盖、分类容器节点被丢弃。**YuqueToMarkdown Pro** 彻底解决了这一问题：
+本工具在浏览器本地解析大纲树并重新组织输出：
+- **保留完整目录结构**：根据大纲树递归创建多层文件夹；
+- **图片离线化**：并发下载正文图片至本地 `assets/` 目录，文档内引用自动替换为对应深度的相对路径；
+- **重名保护**：同级目录下的同名文件自动追加编号，避免覆盖；
+- **目录索引 (MOC)**：为包含子文档的目录生成 `_index.md` 并附带子页面链接，便于在 Obsidian 等笔记软件中浏览；
+- **代码与表格**：保留代码块语言标识（R、Python、Bash 等）与 Markdown 表格语法；
+- **本地运行**：纯前端 JavaScript 处理，无需安装 Node.js 或 Python 环境，不向服务器上传任何文件。
 
-1. **🌲 100% 树形层级保真**：深度解析 Lakebook 中的 `$meta.json` 与 `book.tocYml` 大纲树，精准还原多达 5+ 层嵌套文件夹，彻底告别单层平铺。
-2. **🖼️ 图片自动离线化归档**：独创浏览器端并发抓取 CDN 图片并存储到本地 `assets/` 目录中，正文图片引用自动根据文档所处层级计算相对路径（如 `../../assets/image_xxx.png`），彻底解决断网或语雀图床防盗链失效的隐患。
-3. **🛡️ 智能重名消解**：遇到同级目录下的重名文档（如多次出现的《无标题文档》、《总结》、《分析报告》）自动追加语义编号与识别符，确保 100% 零覆盖、零丢篇。
-4. **🗺️ 自动 MOC 导航生成**：针对仅作为目录容器的空节点（无正文但有子文档），自动转换为标准 Obsidian MOC（`_index.md`），内嵌子级文档双链列表。
-5. **📊 GFM 表格与代码语法高亮**：深度支持 Markdown 表格、数学公式标记、以及 `<pre data-language="...">` 代码块语言高亮提取。
-6. **🔒 纯本地离线转换**：无需配置 Python、Node.js 或任何服务器环境，双击打开单 HTML 文件即可在浏览器端毫秒级处理 GB 级别的大型归档。
+## 使用方法
 
----
+### 方式 1：本地直接打开
+直接用浏览器双击打开 `index.html`，把 `.lakebook` 文件拖入页面，转换完成后会自动打包并触发浏览器下载。
 
-## 🚀 快速上手 (Quick Start)
+### 方式 2：在线使用 (GitHub Pages)
+在仓库的 **Settings -> Pages** 中，将 Source 选为 `Deploy from a branch`（分支 `main`，目录 `/(root)`），即可通过 GitHub Pages 在线运行。
 
-### 方式 1：直接双击使用（推荐）
-1. 下载本项目中的 `index.html`（或 `YuqueToMarkdown-V8.html`）；
-2. 使用 Chrome / Edge / Safari / Firefox 等任意现代浏览器双击打开；
-3. 将您从语雀导出的 `.lakebook` 文件拖入虚线上传框中；
-4. 转换完成后将自动打包并触发下载 `*_Structured.zip`；
-5. 解压后直接将文件夹拖入 **Obsidian Vault** 或您的本地知识库目录即可！
+## 选项说明
 
-### 方式 2：部署到 GitHub Pages
-本项目采用单文件零构建设计（Zero-Build Architecture），您可以直接将本仓库一键开启 **GitHub Pages**，获得专属在线转换工具：
-1. Fork 本仓库并开启 Settings -> Pages；
-2. Source 选择 `Deploy from a branch` -> `main` / `root`；
-3. 即可在全平台（包含移动端/平板端）免安装随时使用。
+页面提供以下三个轻量开关（默认均开启）：
+- **离线图片至 assets/**：抓取正文中的图片并写入压缩包的 `assets/` 目录，将远程链接替换为相对路径；
+- **目录索引 (_index.md)**：为目录节点生成索引文件；
+- **YAML Frontmatter**：在每篇 Markdown 顶部添加包含标题等元数据的 YAML 标头。
 
----
+## 依赖开源组件
 
-## 🛠️ 技术原理 (Architecture)
+- [Turndown](https://github.com/mixmark-io/turndown) - HTML 转 Markdown
+- [turndown-plugin-gfm](https://github.com/laurent22/turndown-plugin-gfm) - GFM 表格插件
+- [js-untar](https://github.com/antelle/js-untar) - 浏览器 TAR 解包
+- [js-yaml](https://github.com/nodeca/js-yaml) - YAML 解析
+- [JSZip](https://github.com/Stuk/jszip) - 浏览器端 ZIP 压缩
+- [FileSaver.js](https://github.com/eligrey/FileSaver.js/) - 文件下载触发
 
-```mermaid
-flowchart TD
-    A[用户上传 .lakebook / .tar] --> B[js-untar 浏览器内存解包]
-    B --> C[提取 $meta.json 与各文档原始 Lake JSON]
-    C --> D[js-yaml 解析 book.tocYml 大纲树]
-    D --> E[构建多叉树层级拓扑与路径映射]
-    E --> F[Turndown + GFM 转换 HTML 为 Markdown]
-    F --> G[注入 YAML Frontmatter 与 MOC 双链]
-    G --> H[JSZip 内存构建树形结构并压缩]
-    H --> I[FileSaver 触发浏览器本地下载]
-```
+## 开源协议
 
----
-
-## 📋 转换配置项
-
-| 配置选项 | 默认状态 | 效果说明 |
-| :--- | :--- | :--- |
-| **下载图片至本地 assets/ (完全离线化)** | 开启 | 浏览器自动并行抓取所有语雀 CDN 图片存入 `assets/`，并将正文图链替换为自适应相对路径，免除未来外链失效之忧 |
-| **为目录生成 _index.md (MOC导航)** | 开启 | 为每个包含子节点的文件夹生成 `_index.md`，内嵌子级双链，便于 Obsidian 等笔记软件全景穿透 |
-| **注入 YAML Frontmatter 元数据** | 开启 | 在生成的 Markdown 顶部注入 `title`、`type: source/wiki`、`source: yuque-lakebook` 等标准元数据 |
-
----
-
-## 🤝 鸣谢与生态
-
-- [Turndown](https://github.com/mixmark-io/turndown) & [turndown-plugin-gfm](https://github.com/laurent22/turndown-plugin-gfm) - HTML to Markdown 核心转换引擎
-- [js-untar](https://github.com/antelle/js-untar) - 浏览器端高性能 TAR 归档解析
-- [js-yaml](https://github.com/nodeca/js-yaml) - 浏览器端 YAML 解析器
-- [JSZip](https://github.com/Stuk/jszip) - 浏览器端 ZIP 压缩打包
-- [Tailwind CSS](https://tailwindcss.com/) - 现代极简设计样式底座
-
----
-
-## 📄 开源许可 (License)
-
-本项目遵循 [MIT License](LICENSE) 协议，欢迎自由使用、修改与衍生开发。如果对您有帮助，欢迎点亮右上角的 ⭐️ **Star**！
+MIT License

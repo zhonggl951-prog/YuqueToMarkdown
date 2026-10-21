@@ -1,0 +1,6 @@
+.DS_Store
+*.lakebook
+*.tar
+*.zip
+dist/
+node_modules/

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YuqueToMarkdown</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/js-untar@2.0.0/build/dist/untar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+    <script src="https://unpkg.com/turndown-plugin-gfm/dist/turndown-plugin-gfm.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    </style>
+</head>
+<body class="bg-zinc-50 text-zinc-900 min-h-screen flex flex-col items-center justify-center p-4 selection:bg-zinc-200">
+
+    <div class="w-full max-w-xl">
+        <!-- Top Nav -->
+        <header class="flex items-center justify-between mb-4 px-1">
+            <div class="flex items-center space-x-2">
+                <div class="w-6 h-6 rounded-md bg-zinc-900 flex items-center justify-center text-white text-xs font-semibold">
+                    Y
+                </div>
+                <span class="text-sm font-semibold tracking-tight text-zinc-900">YuqueToMarkdown</span>
+            </div>
+            <a href="https://github.com" target="_blank" class="text-zinc-400 hover:text-zinc-700 transition-colors" title="GitHub">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            </a>
+        </header>
+
+        <!-- Main Card -->
+        <main class="bg-white rounded-2xl border border-zinc-200/80 shadow-sm p-6 sm:p-7">
+            
+            <!-- Upload Box -->
+            <div id="dropZone" class="border-2 border-dashed border-zinc-200 hover:border-zinc-400 bg-zinc-50/50 hover:bg-zinc-50 rounded-xl p-8 text-center cursor-pointer transition-all duration-200">
+                <div class="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center mx-auto mb-3 text-zinc-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                </div>
+                <div class="text-sm font-medium text-zinc-800">选择或拖入 .lakebook 文件</div>
+                <div class="text-xs text-zinc-400 mt-1">自动还原文件夹层级结构</div>
+                <input type="file" id="fileInput" accept=".lakebook,.tar" class="hidden">
+            </div>
+
+            <!-- Compact Options -->
+            <div class="mt-5 pt-4 border-t border-zinc-100 flex flex-wrap items-center justify-between gap-y-2 text-xs text-zinc-600 select-none">
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-zinc-900">
+                    <input type="checkbox" id="optDownloadImages" checked class="w-3.5 h-3.5 rounded text-zinc-900 focus:ring-zinc-900 border-zinc-300">
+                    <span>离线图片至 assets/</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-zinc-900">
+                    <input type="checkbox" id="optCreateMoc" checked class="w-3.5 h-3.5 rounded text-zinc-900 focus:ring-zinc-900 border-zinc-300">
+                    <span>目录索引 (_index.md)</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-zinc-900">
+                    <input type="checkbox" id="optAddFrontmatter" checked class="w-3.5 h-3.5 rounded text-zinc-900 focus:ring-zinc-900 border-zinc-300">
+                    <span>YAML Frontmatter</span>
+                </label>
+            </div>
+
+            <!-- Processing / Result Area -->
+            <div id="statusContainer" class="hidden mt-5 pt-4 border-t border-zinc-100">
+                <div class="flex items-center justify-between text-xs mb-2">
+                    <span id="statusLabel" class="text-zinc-600 font-medium">处理中...</span>
+                    <span id="percentLabel" class="text-zinc-400 mono">0%</span>
+                </div>
+                <div class="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
+                    <div id="progressBar" class="bg-zinc-900 h-full rounded-full transition-all duration-200" style="width: 0%"></div>
+                </div>
+
+                <!-- Metrics & Summary -->
+                <div id="metricsRow" class="hidden mt-4 flex items-center justify-between text-xs text-zinc-500 mono py-2 px-3 bg-zinc-50 rounded-lg">
+                    <span>文档: <strong id="mDocs" class="text-zinc-800">0</strong></span>
+                    <span>目录: <strong id="mFolders" class="text-zinc-800">0</strong></span>
+                    <span>图片: <strong id="mImages" class="text-zinc-800">0</strong></span>
+                </div>
+
+                <!-- Error Alert -->
+                <div id="errorAlert" class="hidden mt-3 text-xs text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-100"></div>
+            </div>
+
+        </main>
+        
+        <footer class="mt-4 text-center text-xs text-zinc-400">
+            纯前端本地解析 · 不向服务器传输任何数据
+        </footer>
+    </div>
+
+    <!-- Core Conversion Script -->
+    <script>
+        const turndownService = new TurndownService({
+            headingStyle: 'atx',
+            codeBlockStyle: 'fenced'
+        });
+        turndownService.use(turndownPluginGfm.gfm);
+
+        // Preserve code block language tag
+        turndownService.addRule('fencedCodeBlockWithLang', {
+            filter: function (node) {
+                return (
+                    node.nodeName === 'PRE' &&
+                    node.firstChild &&
+                    (node.firstChild.nodeName === 'CODE' || node.classList.contains('ne-codeblock') || node.hasAttribute('data-language'))
+                );
+            },
+            replacement: function (content, node) {
+                const codeNode = node.querySelector('code') || node;
+                let lang = node.getAttribute('data-language') || codeNode.getAttribute('data-language') || '';
+                if (lang === 'plain') lang = '';
+                const codeText = codeNode.textContent || '';
+                return '\n\n```' + lang + '\n' + codeText.replace(/\n$/, '') + '\n```\n\n';
+            }
+        });
+
+        // Context for adaptive image paths
+        let currentDocDir = '';
+        const imageMap = new Map();
+
+        turndownService.addRule('adaptiveImages', {
+            filter: 'img',
+            replacement: function (content, node) {
+                const alt = node.getAttribute('alt') || '';
+                const src = node.getAttribute('src') || '';
+                if (imageMap.has(src)) {
+                    const localFilename = imageMap.get(src);
+                    const relPath = getRelativeAssetsPath(currentDocDir, localFilename);
+                    return `![${alt}](${relPath})`;
+                }
+                return `![${alt}](${src})`;
+            }
+        });
+
+        function getRelativeAssetsPath(dir, filename) {
+            if (!dir) return `assets/${filename}`;
+            const depth = dir.split('/').filter(Boolean).length;
+            return `${'../'.repeat(depth)}assets/${filename}`;
+        }
+
+        const $ = id => document.getElementById(id);
+        const dropZone = $('dropZone');
+        const fileInput = $('fileInput');
+        const statusContainer = $('statusContainer');
+        const progressBar = $('progressBar');
+        const statusLabel = $('statusLabel');
+        const percentLabel = $('percentLabel');
+        const metricsRow = $('metricsRow');
+        const errorAlert = $('errorAlert');
+
+        dropZone.onclick = () => fileInput.click();
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('border-zinc-500', 'bg-zinc-100/50'); };
+        dropZone.ondragleave = () => { dropZone.classList.remove('border-zinc-500', 'bg-zinc-100/50'); };
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-zinc-500', 'bg-zinc-100/50');
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        };
+        fileInput.onchange = (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        };
+
+        function setProgress(percent, text) {
+            progressBar.style.width = `${percent}%`;
+            percentLabel.innerText = `${percent}%`;
+            if (text) statusLabel.innerText = text;
+        }
+
+        function sanitizeFileName(name) {
+            return (name || '未命名').replace(/[\\/:*?"<>|]/g, '_').trim();
+        }
+
+        async function handleFile(file) {
+            errorAlert.classList.add('hidden');
+            metricsRow.classList.add('hidden');
+            statusContainer.classList.remove('hidden');
+            imageMap.clear();
+
+            setProgress(5, '读取归档...');
+
+            const reader = new FileReader();
+            reader.onerror = () => {
+                showError("文件读取失败");
+            };
+
+            reader.onload = async (event) => {
+                try {
+                    setProgress(10, '解包 TAR 归档...');
+                    const tarEntries = await untar(event.target.result);
+
+                    // 1. 查找元数据
+                    let metaEntry = tarEntries.find(e => e.name.includes('$meta.json') || e.name.endsWith('meta.json'));
+                    let jsonEntriesBySlug = new Map();
+
+                    const decoder = new TextDecoder("utf-8");
+                    for (const entry of tarEntries) {
+                        if (entry.name.endsWith('.json') && !entry.name.includes('meta.json')) {
+                            const slug = entry.name.split('/').pop().replace('.json', '');
+                            jsonEntriesBySlug.set(slug, entry);
+                        }
+                    }
+
+                    if (!metaEntry) {
+                        throw new Error("归档包中未包含 $meta.json 元数据文件");
+                    }
+
+                    setProgress(15, '解析大纲结构...');
+                    const metaObj = JSON.parse(decoder.decode(metaEntry.buffer));
+                    const innerMeta = typeof metaObj.meta === 'string' ? JSON.parse(metaObj.meta) : metaObj.meta;
+                    const tocYmlStr = innerMeta.book && innerMeta.book.tocYml;
+
+                    if (!tocYmlStr) {
+                        throw new Error("元数据中缺少 tocYml 大纲数据");
+                    }
+
+                    const tocNodes = jsyaml.load(tocYmlStr);
+
+                    // 2. 映射树形节点
+                    const nodeMap = new Map();
+                    for (const n of tocNodes) {
+                        if (n.type === 'META') continue;
+                        n.children = [];
+                        nodeMap.set(n.uuid, n);
+                    }
+
+                    const rootNodes = [];
+                    for (const n of tocNodes) {
+                        if (n.type === 'META') continue;
+                        if (!n.parent_uuid || !nodeMap.has(n.parent_uuid)) {
+                            rootNodes.push(n);
+                        } else {
+                            nodeMap.get(n.parent_uuid).children.push(n);
+                        }
+                    }
+
+                    const outZip = new JSZip();
+                    const optCreateMoc = $('optCreateMoc').checked;
+                    const optAddFrontmatter = $('optAddFrontmatter').checked;
+                    const optDownloadImages = $('optDownloadImages').checked;
+
+                    // 3. 图片下载
+                    let imageCount = 0;
+                    if (optDownloadImages) {
+                        setProgress(20, '扫描正文图片...');
+                        const uniqueUrls = new Set();
+                        for (const [slug, entry] of jsonEntriesBySlug.entries()) {
+                            try {
+                                const dJson = JSON.parse(decoder.decode(entry.buffer));
+                                const doc = dJson.doc || dJson.data || dJson;
+                                const body = doc.body_html || doc.body || doc.content || "";
+                                const matches = body.matchAll(/<img[^>]+src=['"]([^'"]+)['"]/gi);
+                                for (const m of matches) {
+                                    const src = m[1];
+                                    if (src.startsWith('http://') || src.startsWith('https://')) {
+                                        uniqueUrls.add(src);
+                                    }
+                                }
+                            } catch (e) {}
+                        }
+
+                        const urlArray = Array.from(uniqueUrls);
+                        imageCount = urlArray.length;
+                        let imgSeq = 0;
+                        for (const u of urlArray) {
+                            imgSeq++;
+                            let clean = u.split('?')[0];
+                            let ext = '.png';
+                            const match = clean.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i);
+                            if (match) ext = '.' + match[1].toLowerCase();
+                            
+                            let hash = 0;
+                            for (let i = 0; i < u.length; i++) {
+                                hash = ((hash << 5) - hash) + u.charCodeAt(i);
+                                hash |= 0;
+                            }
+                            const hashHex = Math.abs(hash).toString(16).slice(0, 8);
+                            imageMap.set(u, `img_${hashHex}_${imgSeq}${ext}`);
+                        }
+
+                        // 并发抓取
+                        let completedImgs = 0;
+                        const concurrency = 8;
+                        let fetchIdx = 0;
+
+                        async function fetchWorker() {
+                            while (fetchIdx < urlArray.length) {
+                                const cur = fetchIdx++;
+                                const imgUrl = urlArray[cur];
+                                const localName = imageMap.get(imgUrl);
+                                try {
+                                    const res = await fetch(imgUrl);
+                                    if (res.ok) {
+                                        const blob = await res.blob();
+                                        outZip.file(`assets/${localName}`, blob);
+                                    } else {
+                                        imageMap.delete(imgUrl);
+                                    }
+                                } catch (e) {
+                                    imageMap.delete(imgUrl);
+                                }
+                                completedImgs++;
+                                let prog = Math.floor(20 + (completedImgs / urlArray.length) * 35);
+                                setProgress(prog, `下载图片 (${completedImgs}/${urlArray.length})...`);
+                            }
+                        }
+
+                        const workers = [];
+                        for (let w = 0; w < Math.min(concurrency, urlArray.length); w++) {
+                            workers.push(fetchWorker());
+                        }
+                        await Promise.all(workers);
+                    }
+
+                    // 4. 递归生成 Markdown
+                    let totalNodes = tocNodes.filter(n => n.type !== 'META').length;
+                    let convertedDocs = 0;
+                    let createdFolders = 0;
+
+                    async function processNode(node, parentPath) {
+                        const rawTitle = node.title || '无标题';
+                        const safeTitle = sanitizeFileName(rawTitle);
+                        const isContainer = (node.children && node.children.length > 0) || node.type === 'TITLE';
+
+                        if (isContainer) {
+                            createdFolders++;
+                            const currentDir = parentPath ? `${parentPath}/${safeTitle}` : safeTitle;
+
+                            let bodyContent = "";
+                            if (node.url && jsonEntriesBySlug.has(node.url)) {
+                                try {
+                                    const dJson = JSON.parse(decoder.decode(jsonEntriesBySlug.get(node.url).buffer));
+                                    const doc = dJson.doc || dJson.data || dJson;
+                                    bodyContent = doc.body_html || doc.body || doc.content || "";
+                                } catch (e) {}
+                            }
+
+                            currentDocDir = currentDir;
+                            let mdText = bodyContent ? turndownService.turndown(bodyContent) : "";
+                            let childLinks = node.children.map(c => `- [[${sanitizeFileName(c.title || '无标题')}]]`).join('\n');
+                            let mocSection = childLinks ? `\n\n## 包含子目录与文档\n${childLinks}` : '';
+
+                            if (optCreateMoc) {
+                                let finalMd = `# ${rawTitle}\n\n${mdText}${mocSection}`.trim();
+                                if (optAddFrontmatter) {
+                                    finalMd = `---\ntitle: "${rawTitle}"\ntype: source/wiki\nsource: yuque-lakebook\n---\n\n` + finalMd;
+                                }
+                                outZip.file(`${currentDir}/_index.md`, finalMd);
+                                convertedDocs++;
+                            }
+
+                            const usedNamesInDir = new Set();
+                            for (const child of node.children) {
+                                let cTitle = sanitizeFileName(child.title || '无标题');
+                                if (usedNamesInDir.has(cTitle)) {
+                                    let idx = 2;
+                                    while (usedNamesInDir.has(`${cTitle} (${idx})`)) idx++;
+                                    cTitle = `${cTitle} (${idx})`;
+                                }
+                                usedNamesInDir.add(cTitle);
+                                await processNode(child, currentDir);
+                            }
+
+                        } else {
+                            let bodyContent = "";
+                            if (node.url && jsonEntriesBySlug.has(node.url)) {
+                                try {
+                                    const dJson = JSON.parse(decoder.decode(jsonEntriesBySlug.get(node.url).buffer));
+                                    const doc = dJson.doc || dJson.data || dJson;
+                                    bodyContent = doc.body_html || doc.body || doc.content || "";
+                                } catch (e) {}
+                            }
+
+                            currentDocDir = parentPath;
+                            let mdText = bodyContent ? turndownService.turndown(bodyContent) : "*(空文档)*";
+                            let finalMd = `# ${rawTitle}\n\n${mdText}`.trim();
+                            if (optAddFrontmatter) {
+                                finalMd = `---\ntitle: "${rawTitle}"\ntype: source/wiki\nsource: yuque-lakebook\n---\n\n` + finalMd;
+                            }
+
+                            const filePath = parentPath ? `${parentPath}/${safeTitle}.md` : `${safeTitle}.md`;
+                            outZip.file(filePath, finalMd);
+                            convertedDocs++;
+                        }
+
+                        let baseProg = optDownloadImages ? 55 : 20;
+                        let prog = Math.min(92, Math.floor(baseProg + (convertedDocs / totalNodes) * (92 - baseProg)));
+                        setProgress(prog, `生成文档 (${convertedDocs}/${totalNodes})...`);
+                    }
+
+                    for (const root of rootNodes) {
+                        await processNode(root, "");
+                    }
+
+                    setProgress(94, '打包 ZIP 压缩包...');
+                    const finalBlob = await outZip.generateAsync({ type: 'blob' }, (metadata) => {
+                        let packProg = Math.floor(94 + (metadata.percent / 100) * 6);
+                        setProgress(packProg);
+                    });
+
+                    const outputZipName = file.name.replace(/\.(lakebook|tar)$/i, '') + "_Exported.zip";
+                    saveAs(finalBlob, outputZipName);
+
+                    setProgress(100, '转换完成');
+                    
+                    // Show metrics
+                    $('mDocs').innerText = convertedDocs;
+                    $('mFolders').innerText = createdFolders;
+                    $('mImages').innerText = optDownloadImages ? imageCount : 0;
+                    metricsRow.classList.remove('hidden');
+
+                } catch (err) {
+                    console.error(err);
+                    showError(err.message || "转换发生错误");
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function showError(msg) {
+            errorAlert.classList.remove('hidden');
+            errorAlert.innerText = msg;
+            statusLabel.innerText = "处理中断";
+            progressBar.classList.add('bg-red-500');
+        }
+    </script>
+</body>
+</html>

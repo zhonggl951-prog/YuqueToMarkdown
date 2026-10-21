@@ -1,5 +1,13 @@
 # YuqueToMarkdown
 
+<p align="left">
+  <a href="https://github.com/zhonggl951-prog/YuqueToMarkdown"><img src="https://img.shields.io/github/stars/zhonggl951-prog/YuqueToMarkdown?style=flat-square&logo=github" alt="Stars"></a>
+  <a href="https://github.com/zhonggl951-prog/YuqueToMarkdown/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-yellow.svg?style=flat-square" alt="License"></a>
+  <a href="https://github.com/zhonggl951-prog/YuqueToMarkdown/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome"></a>
+  <img src="https://img.shields.io/badge/platform-browser--only-blue.svg?style=flat-square" alt="Platform">
+  <a href="https://zhonggl951-prog.github.io/YuqueToMarkdown/"><img src="https://img.shields.io/badge/online%20demo-GitHub%20Pages-success?style=flat-square" alt="Live Demo"></a>
+</p>
+
 将语雀导出的知识库（`.lakebook`）转换为保留目录层级与本地图片的 Markdown 压缩包。
 
 ## 功能

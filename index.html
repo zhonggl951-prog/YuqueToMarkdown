@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,9 +32,14 @@
                 </div>
                 <span class="text-sm font-semibold tracking-tight text-zinc-900">YuqueToMarkdown</span>
             </div>
-            <a href="https://github.com/zhonggl951-prog/YuqueToMarkdown" target="_blank" class="text-zinc-400 hover:text-zinc-700 transition-colors" title="GitHub">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-            </a>
+            <div class="flex items-center space-x-3">
+                <button id="langToggleBtn" class="text-xs px-2.5 py-1 rounded-md border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-100/80 text-zinc-600 transition-colors font-medium">
+                    中文
+                </button>
+                <a href="https://github.com/zhonggl951-prog/YuqueToMarkdown" target="_blank" class="text-zinc-400 hover:text-zinc-700 transition-colors" title="GitHub">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                </a>
+            </div>
         </header>
 
         <!-- Main Card -->
@@ -45,8 +50,8 @@
                 <div class="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center mx-auto mb-3 text-zinc-500">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                 </div>
-                <div class="text-sm font-medium text-zinc-800">选择或拖入 .lakebook 文件</div>
-                <div class="text-xs text-zinc-400 mt-1">自动还原文件夹层级结构</div>
+                <div id="dropTitle" class="text-sm font-medium text-zinc-800">Select or drop .lakebook archive here</div>
+                <div id="dropDesc" class="text-xs text-zinc-400 mt-1">Preserves folder hierarchy · Downloads offline images</div>
                 <input type="file" id="fileInput" accept=".lakebook,.tar" class="hidden">
             </div>
 
@@ -54,22 +59,22 @@
             <div class="mt-5 pt-4 border-t border-zinc-100 flex flex-wrap items-center justify-between gap-y-2 text-xs text-zinc-600 select-none">
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-zinc-900">
                     <input type="checkbox" id="optDownloadImages" checked class="w-3.5 h-3.5 rounded text-zinc-900 focus:ring-zinc-900 border-zinc-300">
-                    <span>离线图片至 assets/</span>
+                    <span id="optImagesText">Offline images to assets/</span>
                 </label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-zinc-900">
                     <input type="checkbox" id="optCreateMoc" checked class="w-3.5 h-3.5 rounded text-zinc-900 focus:ring-zinc-900 border-zinc-300">
-                    <span>目录索引 (_index.md)</span>
+                    <span id="optMocText">Directory index (_index.md)</span>
                 </label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-zinc-900">
                     <input type="checkbox" id="optAddFrontmatter" checked class="w-3.5 h-3.5 rounded text-zinc-900 focus:ring-zinc-900 border-zinc-300">
-                    <span>YAML Frontmatter</span>
+                    <span id="optFrontmatterText">YAML Frontmatter</span>
                 </label>
             </div>
 
             <!-- Processing / Result Area -->
             <div id="statusContainer" class="hidden mt-5 pt-4 border-t border-zinc-100">
                 <div class="flex items-center justify-between text-xs mb-2">
-                    <span id="statusLabel" class="text-zinc-600 font-medium">处理中...</span>
+                    <span id="statusLabel" class="text-zinc-600 font-medium">Processing...</span>
                     <span id="percentLabel" class="text-zinc-400 mono">0%</span>
                 </div>
                 <div class="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
@@ -78,9 +83,9 @@
 
                 <!-- Metrics & Summary -->
                 <div id="metricsRow" class="hidden mt-4 flex items-center justify-between text-xs text-zinc-500 mono py-2 px-3 bg-zinc-50 rounded-lg">
-                    <span>文档: <strong id="mDocs" class="text-zinc-800">0</strong></span>
-                    <span>目录: <strong id="mFolders" class="text-zinc-800">0</strong></span>
-                    <span>图片: <strong id="mImages" class="text-zinc-800">0</strong></span>
+                    <span><span id="metricDocsLabel">Docs: </span><strong id="mDocs" class="text-zinc-800">0</strong></span>
+                    <span><span id="metricFoldersLabel">Folders: </span><strong id="mFolders" class="text-zinc-800">0</strong></span>
+                    <span><span id="metricImagesLabel">Images: </span><strong id="mImages" class="text-zinc-800">0</strong></span>
                 </div>
 
                 <!-- Error Alert -->
@@ -89,13 +94,110 @@
 
         </main>
         
-        <footer class="mt-4 text-center text-xs text-zinc-400">
-            纯前端本地解析 · 不向服务器传输任何数据
+        <footer id="footerText" class="mt-4 text-center text-xs text-zinc-400">
+            100% Client-Side Processing · No data sent to any server
         </footer>
     </div>
 
-    <!-- Core Conversion Script -->
+    <!-- Core Conversion & i18n Script -->
     <script>
+        const I18N = {
+            en: {
+                toggleBtn: '中文',
+                dropTitle: 'Select or drop .lakebook archive here',
+                dropDesc: 'Preserves folder hierarchy · Downloads offline images',
+                optImages: 'Offline images to assets/',
+                optMoc: 'Directory index (_index.md)',
+                optFrontmatter: 'YAML Frontmatter',
+                footerText: '100% Client-Side Processing · No data sent to any server',
+                metricDocs: 'Docs: ',
+                metricFolders: 'Folders: ',
+                metricImages: 'Images: ',
+                statusProcessing: 'Processing...',
+                statusRead: 'Reading archive...',
+                statusTar: 'Extracting TAR archive...',
+                statusToc: 'Parsing table of contents...',
+                statusScanImages: 'Scanning document images...',
+                statusDownloadImages: (cur, total) => `Downloading images (${cur}/${total})...`,
+                statusGenDocs: (cur, total) => `Generating documents (${cur}/${total})...`,
+                statusPackZip: 'Packaging ZIP archive...',
+                statusDone: 'Conversion Complete',
+                statusInterrupted: 'Process Interrupted',
+                errRead: 'Failed to read file',
+                errNoMeta: 'Archive missing $meta.json metadata file',
+                errNoToc: 'Metadata missing tocYml outline data',
+                errGeneric: 'An error occurred during conversion',
+                untitled: 'Untitled',
+                emptyDoc: '*(Empty document)*',
+                mocSectionTitle: '## Subdirectories & Documents'
+            },
+            zh: {
+                toggleBtn: 'English',
+                dropTitle: '选择或拖入 .lakebook 文件',
+                dropDesc: '自动还原文件夹层级结构 · 离线并发抓取图片',
+                optImages: '离线图片至 assets/',
+                optMoc: '目录索引 (_index.md)',
+                optFrontmatter: 'YAML Frontmatter',
+                footerText: '纯前端本地解析 · 不向服务器传输任何数据',
+                metricDocs: '文档: ',
+                metricFolders: '目录: ',
+                metricImages: '图片: ',
+                statusProcessing: '处理中...',
+                statusRead: '读取归档...',
+                statusTar: '解包 TAR 归档...',
+                statusToc: '解析大纲结构...',
+                statusScanImages: '扫描正文图片...',
+                statusDownloadImages: (cur, total) => `下载图片 (${cur}/${total})...`,
+                statusGenDocs: (cur, total) => `生成文档 (${cur}/${total})...`,
+                statusPackZip: '打包 ZIP 压缩包...',
+                statusDone: '转换完成',
+                statusInterrupted: '处理中断',
+                errRead: '文件读取失败',
+                errNoMeta: '归档包中未包含 $meta.json 元数据文件',
+                errNoToc: '元数据中缺少 tocYml 大纲数据',
+                errGeneric: '转换发生错误',
+                untitled: '无标题',
+                emptyDoc: '*(空文档)*',
+                mocSectionTitle: '## 包含子目录与文档'
+            }
+        };
+
+        let currentLang = localStorage.getItem('y2m_lang') || 'en';
+
+        function applyLanguage(lang) {
+            currentLang = lang;
+            const dict = I18N[lang] || I18N.en;
+            document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+
+            $('langToggleBtn').innerText = dict.toggleBtn;
+            $('dropTitle').innerText = dict.dropTitle;
+            $('dropDesc').innerText = dict.dropDesc;
+            $('optImagesText').innerText = dict.optImages;
+            $('optMocText').innerText = dict.optMoc;
+            $('optFrontmatterText').innerText = dict.optFrontmatter;
+            $('footerText').innerText = dict.footerText;
+            $('metricDocsLabel').innerText = dict.metricDocs;
+            $('metricFoldersLabel').innerText = dict.metricFolders;
+            $('metricImagesLabel').innerText = dict.metricImages;
+
+            if (currentPhase === 'idle') {
+                $('statusLabel').innerText = dict.statusProcessing;
+            } else if (currentPhase === 'done') {
+                $('statusLabel').innerText = dict.statusDone;
+            }
+        }
+
+        let currentPhase = 'idle';
+
+        $('langToggleBtn').addEventListener('click', () => {
+            const nextLang = currentLang === 'en' ? 'zh' : 'en';
+            localStorage.setItem('y2m_lang', nextLang);
+            applyLanguage(nextLang);
+        });
+
+        // Initialize language
+        applyLanguage(currentLang);
+
         const turndownService = new TurndownService({
             headingStyle: 'atx',
             codeBlockStyle: 'fenced'
@@ -144,7 +246,7 @@
             return `${'../'.repeat(depth)}assets/${filename}`;
         }
 
-        const $ = id => document.getElementById(id);
+        function $(id) { return document.getElementById(id); }
         const dropZone = $('dropZone');
         const fileInput = $('fileInput');
         const statusContainer = $('statusContainer');
@@ -177,28 +279,32 @@
         }
 
         function sanitizeFileName(name) {
-            return (name || '未命名').replace(/[\\/:*?"<>|]/g, '_').trim();
+            const fallback = I18N[currentLang].untitled;
+            return (name || fallback).replace(/[\\/:*?"<>|]/g, '_').trim();
         }
 
         async function handleFile(file) {
+            const dict = I18N[currentLang] || I18N.en;
+            currentPhase = 'processing';
             errorAlert.classList.add('hidden');
             metricsRow.classList.add('hidden');
             statusContainer.classList.remove('hidden');
+            progressBar.classList.remove('bg-red-500');
             imageMap.clear();
 
-            setProgress(5, '读取归档...');
+            setProgress(5, dict.statusRead);
 
             const reader = new FileReader();
             reader.onerror = () => {
-                showError("文件读取失败");
+                showError(dict.errRead);
             };
 
             reader.onload = async (event) => {
                 try {
-                    setProgress(10, '解包 TAR 归档...');
+                    setProgress(10, dict.statusTar);
                     const tarEntries = await untar(event.target.result);
 
-                    // 1. 查找元数据
+                    // 1. Find metadata
                     let metaEntry = tarEntries.find(e => e.name.includes('$meta.json') || e.name.endsWith('meta.json'));
                     let jsonEntriesBySlug = new Map();
 
@@ -211,21 +317,21 @@
                     }
 
                     if (!metaEntry) {
-                        throw new Error("归档包中未包含 $meta.json 元数据文件");
+                        throw new Error(dict.errNoMeta);
                     }
 
-                    setProgress(15, '解析大纲结构...');
+                    setProgress(15, dict.statusToc);
                     const metaObj = JSON.parse(decoder.decode(metaEntry.buffer));
                     const innerMeta = typeof metaObj.meta === 'string' ? JSON.parse(metaObj.meta) : metaObj.meta;
                     const tocYmlStr = innerMeta.book && innerMeta.book.tocYml;
 
                     if (!tocYmlStr) {
-                        throw new Error("元数据中缺少 tocYml 大纲数据");
+                        throw new Error(dict.errNoToc);
                     }
 
                     const tocNodes = jsyaml.load(tocYmlStr);
 
-                    // 2. 映射树形节点
+                    // 2. Map tree nodes
                     const nodeMap = new Map();
                     for (const n of tocNodes) {
                         if (n.type === 'META') continue;
@@ -248,10 +354,10 @@
                     const optAddFrontmatter = $('optAddFrontmatter').checked;
                     const optDownloadImages = $('optDownloadImages').checked;
 
-                    // 3. 图片下载
+                    // 3. Image download
                     let imageCount = 0;
                     if (optDownloadImages) {
-                        setProgress(20, '扫描正文图片...');
+                        setProgress(20, dict.statusScanImages);
                         const uniqueUrls = new Set();
                         for (const [slug, entry] of jsonEntriesBySlug.entries()) {
                             try {
@@ -287,7 +393,7 @@
                             imageMap.set(u, `img_${hashHex}_${imgSeq}${ext}`);
                         }
 
-                        // 并发抓取
+                        // Concurrently fetch images
                         let completedImgs = 0;
                         const concurrency = 8;
                         let fetchIdx = 0;
@@ -310,7 +416,7 @@
                                 }
                                 completedImgs++;
                                 let prog = Math.floor(20 + (completedImgs / urlArray.length) * 35);
-                                setProgress(prog, `下载图片 (${completedImgs}/${urlArray.length})...`);
+                                setProgress(prog, dict.statusDownloadImages(completedImgs, urlArray.length));
                             }
                         }
 
@@ -321,13 +427,13 @@
                         await Promise.all(workers);
                     }
 
-                    // 4. 递归生成 Markdown
+                    // 4. Recursively generate Markdown
                     let totalNodes = tocNodes.filter(n => n.type !== 'META').length;
                     let convertedDocs = 0;
                     let createdFolders = 0;
 
                     async function processNode(node, parentPath) {
-                        const rawTitle = node.title || '无标题';
+                        const rawTitle = node.title || dict.untitled;
                         const safeTitle = sanitizeFileName(rawTitle);
                         const isContainer = (node.children && node.children.length > 0) || node.type === 'TITLE';
 
@@ -346,8 +452,8 @@
 
                             currentDocDir = currentDir;
                             let mdText = bodyContent ? turndownService.turndown(bodyContent) : "";
-                            let childLinks = node.children.map(c => `- [[${sanitizeFileName(c.title || '无标题')}]]`).join('\n');
-                            let mocSection = childLinks ? `\n\n## 包含子目录与文档\n${childLinks}` : '';
+                            let childLinks = node.children.map(c => `- [[${sanitizeFileName(c.title || dict.untitled)}]]`).join('\n');
+                            let mocSection = childLinks ? `\n\n${dict.mocSectionTitle}\n${childLinks}` : '';
 
                             if (optCreateMoc) {
                                 let finalMd = `# ${rawTitle}\n\n${mdText}${mocSection}`.trim();
@@ -360,7 +466,7 @@
 
                             const usedNamesInDir = new Set();
                             for (const child of node.children) {
-                                let cTitle = sanitizeFileName(child.title || '无标题');
+                                let cTitle = sanitizeFileName(child.title || dict.untitled);
                                 if (usedNamesInDir.has(cTitle)) {
                                     let idx = 2;
                                     while (usedNamesInDir.has(`${cTitle} (${idx})`)) idx++;
@@ -381,7 +487,7 @@
                             }
 
                             currentDocDir = parentPath;
-                            let mdText = bodyContent ? turndownService.turndown(bodyContent) : "*(空文档)*";
+                            let mdText = bodyContent ? turndownService.turndown(bodyContent) : dict.emptyDoc;
                             let finalMd = `# ${rawTitle}\n\n${mdText}`.trim();
                             if (optAddFrontmatter) {
                                 finalMd = `---\ntitle: "${rawTitle}"\ntype: source/wiki\nsource: yuque-lakebook\n---\n\n` + finalMd;
@@ -394,14 +500,14 @@
 
                         let baseProg = optDownloadImages ? 55 : 20;
                         let prog = Math.min(92, Math.floor(baseProg + (convertedDocs / totalNodes) * (92 - baseProg)));
-                        setProgress(prog, `生成文档 (${convertedDocs}/${totalNodes})...`);
+                        setProgress(prog, dict.statusGenDocs(convertedDocs, totalNodes));
                     }
 
                     for (const root of rootNodes) {
                         await processNode(root, "");
                     }
 
-                    setProgress(94, '打包 ZIP 压缩包...');
+                    setProgress(94, dict.statusPackZip);
                     const finalBlob = await outZip.generateAsync({ type: 'blob' }, (metadata) => {
                         let packProg = Math.floor(94 + (metadata.percent / 100) * 6);
                         setProgress(packProg);
@@ -410,7 +516,8 @@
                     const outputZipName = file.name.replace(/\.(lakebook|tar)$/i, '') + "_Exported.zip";
                     saveAs(finalBlob, outputZipName);
 
-                    setProgress(100, '转换完成');
+                    currentPhase = 'done';
+                    setProgress(100, dict.statusDone);
                     
                     // Show metrics
                     $('mDocs').innerText = convertedDocs;
@@ -420,7 +527,7 @@
 
                 } catch (err) {
                     console.error(err);
-                    showError(err.message || "转换发生错误");
+                    showError(err.message || dict.errGeneric);
                 }
             };
 
@@ -428,9 +535,11 @@
         }
 
         function showError(msg) {
+            currentPhase = 'error';
+            const dict = I18N[currentLang] || I18N.en;
             errorAlert.classList.remove('hidden');
             errorAlert.innerText = msg;
-            statusLabel.innerText = "处理中断";
+            statusLabel.innerText = dict.statusInterrupted;
             progressBar.classList.add('bg-red-500');
         }
     </script>

@@ -1,6 +1,13 @@
+<div align="center">
+
 # YuqueToMarkdown
 
-<p align="left">
+**Convert Yuque .lakebook archives into organized Markdown packages with folder hierarchy and local images**
+
+<!-- badges -->
+<p align="center">
+  <a href="https://github.com/zhonggl951-prog/YuqueToMarkdown/releases"><img src="https://img.shields.io/github/v/release/zhonggl951-prog/YuqueToMarkdown?style=flat-square&color=blue" alt="Release"></a>
+  <a href="https://github.com/zhonggl951-prog/YuqueToMarkdown/actions/workflows/validate.yml"><img src="https://img.shields.io/github/actions/workflow/status/zhonggl951-prog/YuqueToMarkdown/validate.yml?branch=main&style=flat-square" alt="Build Status"></a>
   <a href="https://github.com/zhonggl951-prog/YuqueToMarkdown"><img src="https://img.shields.io/github/stars/zhonggl951-prog/YuqueToMarkdown?style=flat-square&logo=github" alt="Stars"></a>
   <a href="https://github.com/zhonggl951-prog/YuqueToMarkdown/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-yellow.svg?style=flat-square" alt="License"></a>
   <a href="https://github.com/zhonggl951-prog/YuqueToMarkdown/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome"></a>
@@ -8,41 +15,81 @@
   <a href="https://zhonggl951-prog.github.io/YuqueToMarkdown/"><img src="https://img.shields.io/badge/online%20demo-GitHub%20Pages-success?style=flat-square" alt="Live Demo"></a>
 </p>
 
-将语雀导出的知识库（`.lakebook`）转换为保留目录层级与本地图片的 Markdown 压缩包。
+<!-- language switcher -->
+<p align="center">
+  <strong>English</strong> | <a href="README_zh-CN.md">简体中文</a>
+</p>
 
-## 功能
+</div>
 
-- **保留完整目录结构**：根据大纲树递归创建多层文件夹；
-- **图片离线化**：并发下载正文图片至本地 `assets/` 目录，文档内引用自动替换为对应深度的相对路径；
-- **重名保护**：同级目录下的同名文件自动追加编号，避免覆盖；
-- **目录索引 (MOC)**：为包含子文档的目录生成 `_index.md` 并附带子页面链接，便于在 Obsidian 等笔记软件中浏览；
-- **代码与表格**：保留代码块语言标识（R、Python、Bash 等）与 Markdown 表格语法；
-- **本地运行**：纯前端 JavaScript 处理，无需安装 Node.js 或 Python 环境，不向服务器上传任何文件。
+---
 
-## 使用方法
+`YuqueToMarkdown` is a lightweight, zero-build, client-side tool that converts Yuque knowledge base exports (`.lakebook` / `.tar`) into structured Markdown packages. It runs entirely inside your web browser without requiring Node.js or Python installations. The tool preserves multi-level folder hierarchies, downloads remote images locally into an `assets/` directory with depth-aware relative paths, and generates MOC index cards for seamless migration to Obsidian, Logseq, and Notion.
 
-### 方式 1：本地直接打开
-直接用浏览器双击打开 `index.html`，把 `.lakebook` 文件拖入页面，转换完成后会自动打包并触发浏览器下载。
+<p align="center">
+  <img src="assets/preview.svg" alt="YuqueToMarkdown Preview" width="100%">
+</p>
 
-### 方式 2：在线使用 (GitHub Pages)
-在仓库的 **Settings -> Pages** 中，将 Source 选为 `Deploy from a branch`（分支 `main`，目录 `/(root)`），即可通过 GitHub Pages 在线运行。
+## Features
 
-## 选项说明
+- **Multi-Level Directory Hierarchy**: Recursively parses Yuque's table of contents (`tocYml`) to recreate nested folder trees instead of flattening all documents into a single directory.
+- **Offline Asset Localization**: Concurrently downloads remote images into an `assets/` folder and rewrites image markdown links into depth-aware relative paths (e.g., `../../assets/image.png`), preventing broken links and anti-hotlinking blocks.
+- **MOC Navigation Cards**: Automatically generates `_index.md` files for directories with subdocuments, embedding internal wikilinks for topological graph navigation in Obsidian.
+- **Duplicate Name Protection**: Automatically appends numeric indices to documents with identical titles or unnamed files, preventing unintentional file overwrites.
+- **Code Highlighting & GFM Tables**: Preserves language identifiers in code blocks (R, Python, Bash, JSON) and converts table elements into GitHub Flavored Markdown (GFM) tables.
+- **Privacy-First & Zero Uploads**: Runs 100% locally in the browser via client-side JavaScript and Web Workers. No personal data or document content is ever sent to an external server.
 
-页面提供以下三个轻量开关（默认均开启）：
-- **离线图片至 assets/**：抓取正文中的图片并写入压缩包的 `assets/` 目录，将远程链接替换为相对路径；
-- **目录索引 (_index.md)**：为目录节点生成索引文件；
-- **YAML Frontmatter**：在每篇 Markdown 顶部添加包含标题等元数据的 YAML 标头。
+## Usage
 
-## 依赖开源组件
+### Option 1: Online Web App (Recommended)
+Visit the hosted GitHub Pages application:  
+👉 **[zhonggl951-prog.github.io/YuqueToMarkdown](https://zhonggl951-prog.github.io/YuqueToMarkdown/)**
 
-- [Turndown](https://github.com/mixmark-io/turndown) - HTML 转 Markdown
-- [turndown-plugin-gfm](https://github.com/laurent22/turndown-plugin-gfm) - GFM 表格插件
-- [js-untar](https://github.com/antelle/js-untar) - 浏览器 TAR 解包
-- [js-yaml](https://github.com/nodeca/js-yaml) - YAML 解析
-- [JSZip](https://github.com/Stuk/jszip) - 浏览器端 ZIP 压缩
-- [FileSaver.js](https://github.com/eligrey/FileSaver.js/) - 文件下载触发
+Drag and drop your exported `.lakebook` or `.tar` file into the dashed box. Once processing finishes, a structured `.zip` archive will be generated and automatically downloaded.
 
-## 开源协议
+### Option 2: Local Offline Execution
+Clone the repository and open `index.html` directly in any modern browser:
+```bash
+git clone https://github.com/zhonggl951-prog/YuqueToMarkdown.git
+cd YuqueToMarkdown
+open index.html # On Windows: double-click index.html
+```
 
-MIT License
+## Options
+
+The tool provides three configurable toggles (enabled by default):
+
+| Option | Default | Description |
+| :--- | :--- | :--- |
+| **Download Images to assets/** | `Enabled` | Fetches remote images concurrently and rewrites links to local relative paths |
+| **Directory Index (_index.md)** | `Enabled` | Creates MOC index notes with internal wikilinks for folders containing child pages |
+| **YAML Frontmatter** | `Enabled` | Adds YAML metadata blocks (title, created time) to the top of each Markdown file |
+
+## Project Structure
+
+```
+YuqueToMarkdown/
+├── index.html                # Single-page client-side application (Tailwind CSS + Vanilla JS)
+├── assets/
+│   └── preview.svg           # High-resolution vector preview graphic
+├── .github/
+│   └── workflows/
+│       └── validate.yml      # GitHub Actions validation workflow
+├── CONTRIBUTING.md           # Contribution guidelines
+├── LICENSE                   # MIT License
+├── README.md                 # English documentation (default)
+└── README_zh-CN.md           # Chinese documentation (Simplified Chinese)
+```
+
+## Dependencies
+
+- [Turndown](https://github.com/mixmark-io/turndown) - HTML to Markdown converter
+- [turndown-plugin-gfm](https://github.com/laurent22/turndown-plugin-gfm) - GFM table plugin for Turndown
+- [js-untar](https://github.com/antelle/js-untar) - In-browser TAR extraction
+- [js-yaml](https://github.com/nodeca/js-yaml) - In-browser YAML parser
+- [JSZip](https://github.com/Stuk/jszip) - Client-side ZIP compression
+- [FileSaver.js](https://github.com/eligrey/FileSaver.js/) - HTML5 saveAs implementation
+
+## License
+
+[MIT License](LICENSE)

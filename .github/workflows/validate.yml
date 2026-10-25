@@ -1,0 +1,20 @@
+name: Validate Tool
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify entrypoint
+        run: |
+          test -f index.html || exit 1
+          grep -q "<title>YuqueToMarkdown</title>" index.html || exit 1
+          echo "index.html verified successfully."
